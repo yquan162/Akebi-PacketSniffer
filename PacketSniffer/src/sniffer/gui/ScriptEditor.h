@@ -50,6 +50,7 @@ namespace sniffer::gui
 	public:
 		static void Open(script::Script* script);
 		static bool IsOpened(script::Script* script);
+		static void Reload(script::Script* script);
 
 		static void Draw();
 

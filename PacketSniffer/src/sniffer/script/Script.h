@@ -28,6 +28,7 @@ namespace sniffer::script
 		const std::string& GetContent() const;
 		virtual void SetContent(const std::string& content);
 		virtual void SetContent(std::string&& content);
+		void CompileScript();
 
 		ScriptType GetType() const;
 
@@ -54,8 +55,6 @@ namespace sniffer::script
 
 		void SetError(ErrorType type, const std::string& content);
 		void SetError(ErrorType type, std::string&& content);
-
-		void CompileScript();
 	private:
 		
 		std::string m_Name;

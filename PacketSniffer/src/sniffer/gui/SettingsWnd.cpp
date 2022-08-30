@@ -19,7 +19,7 @@ namespace sniffer::gui
 		auto& config = Config::instance();
 		if (ImGui::BeginGroupPanel("Proto"))
 		{
-			ConfigWidget(config.f_ProtoIDMode, "The mode searching the id's for .proto");
+			ConfigWidget(config.f_ProtoIDMode, "The mode for searching id's for .proto");
 
 			static bool isChanging = false;
 			static std::string protoDirPathTemp = config.f_ProtoDirPath;
@@ -65,14 +65,19 @@ namespace sniffer::gui
 		}
 		ImGui::EndGroupPanel();
 
+		ImGui::BeginGroupPanel("Packet");
+		ConfigWidget(config.f_CapturePackets, "Manual toggle for capturing packets.");
+		ConfigWidget(config.f_PacketLevelFilter, "Filtering will be executed on the packet level,\nso packets will not be saved if they don't pass filter conditions."
+			"\nFiltered packets will not be passed to modify scripts.\nIt helps reduce memory consumption.");
 		ConfigWidget(config.f_ShowUnknownPackets, "Show unknown packets in capture list.");
-		ConfigWidget(config.f_ShowUnknownFields, "Show unknown fields in capture list.");
-		ConfigWidget(config.f_ShowUnsettedFields, "Show fields even the their data wasn't passed.");
-		ConfigWidget(config.f_ScrollFollowing, "Following for items when new data appear above the scroll region.");
+		ImGui::EndGroupPanel();
 
-		ConfigWidget(config.f_HighlightRelativities, "Highlight the packet relativities in packet capture window.");
-		ConfigWidget(config.f_PacketLevelFilter, "Filtering will be execute on packet level,\n so packet will not save if it don't accept filter conditions."
-			"\nFiltered packet will not passed to modify scripts.\nIt helps to reduce memory consumption.");
+		ImGui::BeginGroupPanel("Display");
+		ConfigWidget(config.f_ShowUnknownFields, "Show unknown fields in packet view.");
+		ConfigWidget(config.f_ShowUnsettedFields, "Show fields with missing data in packet view.");
+		ConfigWidget(config.f_ScrollFollowing, "Follow items when new data appears above the scroll region.");
+		ConfigWidget(config.f_HighlightRelativities, "Highlight packet relativities in capture list.");
+		ImGui::EndGroupPanel();
 	}
 
 	WndInfo& SettingsWnd::GetInfo()

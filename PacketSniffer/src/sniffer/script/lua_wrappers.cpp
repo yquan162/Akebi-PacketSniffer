@@ -572,12 +572,12 @@ namespace sniffer::script
 		case ProtoValue::Type::List:
 		{
 			lua_newtable(L);
+			int top = lua_gettop(L);
 			int i = 1;
 			for (auto& value : value->to_list())
 			{
-				lua_pushinteger(L, i);
 				Luna<ValueWrapper>::Push(L, new ValueWrapper(&value, modifiable));
-				i++;
+				lua_rawseti(L, top, i++);
 			}
 			break;
 		}

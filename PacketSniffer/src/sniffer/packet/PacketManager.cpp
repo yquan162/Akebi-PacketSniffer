@@ -159,6 +159,14 @@ namespace sniffer::packet
 
 	void PacketManager::ProcessRawData(RawPacketData&& raw)
 	{
+		auto& config = Config::instance();
+		if (!config.f_CapturePackets)
+		{
+			if (s_Handler->IsModifyingEnabled())
+				s_ModifyResponse.store(new std::pair<ModifyType, RawPacketData>(ModifyType::Unchanged, std::move(raw)));
+			return;
+		}
+
 		auto result = s_Parser->Parse(raw);
 		if (!result.success)
 		{
@@ -170,12 +178,10 @@ namespace sniffer::packet
 		auto newPacket = Packet(std::move(raw), std::move(result.content),
 			std::move(result.head), GenerateUniqueID());
 
-		auto& config = Config::instance();
 		if (config.f_PacketLevelFilter && !filter::FilterManager::Execute(newPacket))
 		{
 			if (s_Handler->IsModifyingEnabled())
 				s_ModifyResponse.store(new std::pair<ModifyType, RawPacketData>(ModifyType::Unchanged, std::move(newPacket.raw())));
-
 			return;
 		}
 
