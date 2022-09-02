@@ -23,7 +23,6 @@ namespace sniffer
 		config::Field<bool> f_ShowUnsettedFields;
 		config::Field<bool> f_HighlightRelativities;
 		config::Field<bool> f_PacketLevelFilter;
-		config::Field<bool> f_CapturePackets;
 
 	private:
 		Config();

@@ -212,7 +212,7 @@ namespace sniffer
 			{ "ABILITY_INVOKE_ARGUMENT_META_ADD_OR_GET_ABILITY_AND_TRIGGER", "AbilityMetaAddOrGetAbilityAndTrigger" },
 			{ "ABILITY_INVOKE_ARGUMENT_META_SET_KILLED_STATE", "AbilityMetaSetKilledState" },
 			{ "ABILITY_INVOKE_ARGUMENT_META_SET_ABILITY_TRIGGER", "AbilityMetaSetAbilityTrigger" },
-			//{ "ABILITY_INVOKE_ARGUMENT_META_ADD_NEW_ABILITY", "AbilityMetaAddNewAbility" },
+			{ "ABILITY_INVOKE_ARGUMENT_META_ADD_NEW_ABILITY", "AbilityMetaAddAbility" },
 			//{ "ABILITY_INVOKE_ARGUMENT_META_REMOVE_ABILITY", "AbilityMetaRemoveAbility" },
 			{ "ABILITY_INVOKE_ARGUMENT_META_SET_MODIFIER_APPLY_ENTITY", "AbilityMetaSetModifierApplyEntityId" },
 			{ "ABILITY_INVOKE_ARGUMENT_META_MODIFIER_DURABILITY_CHANGE", "AbilityMetaModifierDurabilityChange" },

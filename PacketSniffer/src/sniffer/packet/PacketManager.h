@@ -16,6 +16,7 @@ namespace sniffer::packet
 
 		static const std::list<Packet>& GetPackets();
 		static size_t GetPacketCount();
+		static size_t GetQueueSize();
 
 		static const Packet* GetPacket(uint64_t uniqueID);
 
@@ -38,6 +39,7 @@ namespace sniffer::packet
 
 		static void SetHandler(IPacketHandler* handler);
 		static bool IsConnected();
+		static void UpdateConnection(const bool connect);
 
 		static void Update();
 		static void Clear();

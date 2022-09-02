@@ -159,14 +159,6 @@ namespace sniffer::packet
 
 	void PacketManager::ProcessRawData(RawPacketData&& raw)
 	{
-		auto& config = Config::instance();
-		if (!config.f_CapturePackets)
-		{
-			if (s_Handler->IsModifyingEnabled())
-				s_ModifyResponse.store(new std::pair<ModifyType, RawPacketData>(ModifyType::Unchanged, std::move(raw)));
-			return;
-		}
-
 		auto result = s_Parser->Parse(raw);
 		if (!result.success)
 		{
@@ -178,6 +170,7 @@ namespace sniffer::packet
 		auto newPacket = Packet(std::move(raw), std::move(result.content),
 			std::move(result.head), GenerateUniqueID());
 
+		auto& config = Config::instance();
 		if (config.f_PacketLevelFilter && !filter::FilterManager::Execute(newPacket))
 		{
 			if (s_Handler->IsModifyingEnabled())
@@ -364,6 +357,11 @@ namespace sniffer::packet
 		return s_Handler->IsConnected();
 	}
 
+	void PacketManager::UpdateConnection(const bool connect)
+	{
+		s_Handler->UpdateConnection(connect);
+	}
+
 	uint64_t PacketManager::GenerateUniqueID()
 	{
 		static uint64_t sequence_global_id = 0;
@@ -491,6 +489,11 @@ namespace sniffer::packet
 	size_t PacketManager::GetPacketCount()
 	{
 		return s_Packets.size();
+	}
+
+	size_t PacketManager::GetQueueSize()
+	{
+		return s_ReceiveQueue.size();
 	}
 
 	void PacketManager::CheckSessionUpdate(uint32_t sequenceID)

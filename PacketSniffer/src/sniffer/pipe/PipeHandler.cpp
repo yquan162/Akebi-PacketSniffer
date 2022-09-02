@@ -10,8 +10,10 @@ namespace sniffer::pipe
 		{
 			if (!m_Server.IsOpened())
 			{
-				m_Server.Open(m_PipeName);
-				std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				if (m_ShouldConnect) {
+					m_Server.Open(m_PipeName);
+					std::this_thread::sleep_for(std::chrono::milliseconds(500));
+				}
 				continue;
 			}
 
@@ -76,4 +78,13 @@ namespace sniffer::pipe
 		return m_Server.IsConnected();
 	}
 
+	void PipeHandler::UpdateConnection(const bool connect)
+	{
+		if (connect != m_Server.IsConnected())
+		{
+			m_ShouldConnect = connect;
+			if (!connect)
+				m_Server.Close();
+		}
+	}
 }

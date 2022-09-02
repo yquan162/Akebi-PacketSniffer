@@ -24,6 +24,9 @@ namespace sniffer::gui
 	static size_t _packetCount = 0;
 	static int _packetCountDiff = 0;
 
+	static size_t _queueSize = 0;
+	static int _queueSizeDiff = 0;
+
 	SnifferWnd::SnifferWnd() 
 	{
 		auto& filterWnd = FilterWnd::instance();
@@ -54,6 +57,15 @@ namespace sniffer::gui
 
 #undef min
 #undef max
+
+	static void UpdateQueueSize()
+	{
+		UPDATE_DELAY(500);
+
+		size_t newSize = packet::PacketManager::GetQueueSize();
+		_queueSizeDiff = newSize - _queueSize;
+		_queueSize = newSize;
+	}
 
 	static void UpdatePacketCount()
 	{
@@ -167,6 +179,12 @@ namespace sniffer::gui
 			currX -= ImGui::CalcTextSize(packetCountText.c_str()).x + ImGui::GetStyle().ItemSpacing.x;
 			ImGui::SameLine(currX, 0.0f);
 			ImGui::Text(packetCountText.c_str());
+
+			UpdateQueueSize();
+			auto queueSizeText = fmt::format("Queue: {:d} | {:+d}", _queueSize, _queueSizeDiff);
+			currX -= ImGui::CalcTextSize(queueSizeText.c_str()).x + ImGui::GetStyle().ItemSpacing.x;
+			ImGui::SameLine(currX, 0.0f);
+			ImGui::Text(queueSizeText.c_str());
 
 			ImGui::EndMenuBar();
 		}

@@ -2,6 +2,7 @@
 #include "SettingsWnd.h"
 
 #include <sniffer/Config.h>
+#include <sniffer/packet/PacketManager.h>
 
 namespace sniffer::gui
 {
@@ -17,6 +18,40 @@ namespace sniffer::gui
 	void SettingsWnd::Draw()
 	{
 		auto& config = Config::instance();
+
+		if (ImGui::BeginGroupPanel("Packet"))
+		{
+			static bool shouldConnect = true;
+			const bool isConnecting = shouldConnect && !packet::PacketManager::IsConnected();
+			const char* connectText = isConnecting ? "Connecting..." : (shouldConnect ? "Disconnect Pipe" : "Connect Pipe");
+
+			if (isConnecting)
+				ImGui::BeginDisabled();
+
+			if (ImGui::Button(connectText))
+			{
+				shouldConnect = !shouldConnect;
+				packet::PacketManager::UpdateConnection(shouldConnect);
+			}
+
+			if (isConnecting)
+				ImGui::EndDisabled();
+
+			ConfigWidget(config.f_PacketLevelFilter, "Filtering will be executed on the packet level,\nso packets will not be saved if they don't pass filter conditions."
+				"\nFiltered packets will not be passed to modify scripts.\nIt helps reduce memory consumption.");
+			ConfigWidget(config.f_ShowUnknownPackets, "Show unknown packets in capture list.");
+		}
+		ImGui::EndGroupPanel();
+
+		if (ImGui::BeginGroupPanel("Display"))
+		{
+			ConfigWidget(config.f_ShowUnknownFields, "Show unknown fields in packet view.");
+			ConfigWidget(config.f_ShowUnsettedFields, "Show fields with missing data in packet view.");
+			ConfigWidget(config.f_ScrollFollowing, "Follow items when new data appears above the scroll region.");
+			ConfigWidget(config.f_HighlightRelativities, "Highlight packet relativities in capture list.");
+		}
+		ImGui::EndGroupPanel();
+
 		if (ImGui::BeginGroupPanel("Proto"))
 		{
 			ConfigWidget(config.f_ProtoIDMode, "The mode for searching id's for .proto");
@@ -63,20 +98,6 @@ namespace sniffer::gui
 				}
 			}
 		}
-		ImGui::EndGroupPanel();
-
-		ImGui::BeginGroupPanel("Packet");
-		ConfigWidget(config.f_CapturePackets, "Manual toggle for capturing packets.");
-		ConfigWidget(config.f_PacketLevelFilter, "Filtering will be executed on the packet level,\nso packets will not be saved if they don't pass filter conditions."
-			"\nFiltered packets will not be passed to modify scripts.\nIt helps reduce memory consumption.");
-		ConfigWidget(config.f_ShowUnknownPackets, "Show unknown packets in capture list.");
-		ImGui::EndGroupPanel();
-
-		ImGui::BeginGroupPanel("Display");
-		ConfigWidget(config.f_ShowUnknownFields, "Show unknown fields in packet view.");
-		ConfigWidget(config.f_ShowUnsettedFields, "Show fields with missing data in packet view.");
-		ConfigWidget(config.f_ScrollFollowing, "Follow items when new data appears above the scroll region.");
-		ConfigWidget(config.f_HighlightRelativities, "Highlight packet relativities in capture list.");
 		ImGui::EndGroupPanel();
 	}
 
