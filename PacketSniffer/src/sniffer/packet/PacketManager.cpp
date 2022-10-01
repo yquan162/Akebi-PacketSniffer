@@ -208,8 +208,8 @@ namespace sniffer::packet
 
 		s_PacketMap[packet.uid()] = &packet;
 		FillRelativities(packet);
-		s_PacketReceiveEvent(&packet, 0);
 		FillNestedMessages(packet);
+		s_PacketReceiveEvent(&packet, 0);
 
 		if (!packet.content().has_flag(ProtoMessage::Flag::IsUnpacked))
 			ProcessModify(packet);
