@@ -37,8 +37,25 @@ namespace sniffer::gui
 			if (isConnecting)
 				ImGui::EndDisabled();
 
+			ImGui::SameLine();
+
+			if (ImGui::Button("Clear Queue"))
+			{
+				packet::PacketManager::ClearQueue();
+			}
+
 			ConfigWidget(config.f_PacketLevelFilter, "Filtering will be executed on the packet level,\nso packets will not be saved if they don't pass filter conditions."
 				"\nFiltered packets will not be passed to modify scripts.\nIt helps reduce memory consumption.");
+
+			if (config.f_PacketLevelFilter)
+				ImGui::BeginDisabled();
+
+			ConfigWidget(config.f_PassThroughMode, "If enabled, packets will pass filters but won't save.\nNot compatible with packet level filter."
+				"\nModify scripts will also be ignored.\nUseful for filter script logging without eating too much memory.");
+
+			if (config.f_PacketLevelFilter)
+				ImGui::EndDisabled();
+
 			ConfigWidget(config.f_ShowUnknownPackets, "Show unknown packets in capture list.");
 		}
 		ImGui::EndGroupPanel();

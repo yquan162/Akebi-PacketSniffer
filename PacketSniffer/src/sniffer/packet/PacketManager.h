@@ -42,12 +42,14 @@ namespace sniffer::packet
 		static void UpdateConnection(const bool connect);
 
 		static void Update();
-		static void Clear();
+		static void ClearPackets();
+		static void ClearQueue();
 
 	private:
 
 		static void ProcessRawData(RawPacketData&& raw);
 		static void ProcessPacket(Packet& packet);
+		static void PassThroughPacket(Packet& packet);
 
 		static void FillNestedMessages(Packet& packet);
 		static void FillRelativities(Packet& packet);

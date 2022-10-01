@@ -37,13 +37,21 @@ namespace sniffer::packet
 		s_NetworkThread = new std::thread(PacketManager::NetworkLoop);
 	}
 
-	void PacketManager::Clear()
+	void PacketManager::ClearPackets()
 	{
 		s_ChildMap.clear();
 		s_UnpackedMap.clear();
 		s_PacketMap.clear();
 		s_RelatedPackets.clear();
 		s_Packets.clear();
+	}
+
+	void PacketManager::ClearQueue()
+	{
+		while(s_ReceiveQueue.size() > 0) // this might be a really bad implementation but it works
+		{
+			s_ReceiveQueue.pop();
+		}
 	}
 
 	std::list<Packet> const& PacketManager::GetPackets()
@@ -177,6 +185,13 @@ namespace sniffer::packet
 				s_ModifyResponse.store(new std::pair<ModifyType, RawPacketData>(ModifyType::Unchanged, std::move(newPacket.raw())));
 			return;
 		}
+		else if (!config.f_PacketLevelFilter && config.f_PassThroughMode)
+		{
+			if (s_Handler->IsModifyingEnabled())
+				s_ModifyResponse.store(new std::pair<ModifyType, RawPacketData>(ModifyType::Unchanged, std::move(newPacket.raw())));
+			PassThroughPacket(newPacket);
+			return;
+		}
 
 		auto& newPacketRef = s_Packets.emplace_back(std::move(newPacket));
 		ProcessPacket(newPacketRef);
@@ -184,6 +199,13 @@ namespace sniffer::packet
 
 	void PacketManager::ProcessPacket(Packet& packet)
 	{
+		auto& config = Config::instance();
+		if (!config.f_PacketLevelFilter && config.f_PassThroughMode)
+		{
+			PassThroughPacket(packet);
+			return;
+		}
+
 		s_PacketMap[packet.uid()] = &packet;
 		FillRelativities(packet);
 		s_PacketReceiveEvent(&packet, 0);
@@ -191,6 +213,12 @@ namespace sniffer::packet
 
 		if (!packet.content().has_flag(ProtoMessage::Flag::IsUnpacked))
 			ProcessModify(packet);
+	}
+
+	void PacketManager::PassThroughPacket(Packet& packet)
+	{
+		FillNestedMessages(packet);
+		filter::FilterManager::Execute(packet);
 	}
 
 	void PacketManager::ProcessModify(Packet& packet)
@@ -208,6 +236,7 @@ namespace sniffer::packet
 		if (!s_Parser->IsUnionPacket(packet.mid()))
 			return;
 
+		auto& config = Config::instance();
 		auto results = s_Parser->ParseUnionPacket(packet.content(), packet.mid(), false);
 
 		std::vector<uint64_t> childs;
@@ -221,10 +250,15 @@ namespace sniffer::packet
 
 			auto newPacket = Packet(std::move(newRawData),
 				std::move(nested.content), ProtoMessage(), GenerateUniqueID());
-
-			auto& config = Config::instance();
+	
 			if (config.f_PacketLevelFilter && !filter::FilterManager::Execute(newPacket))
 				continue;
+
+			if (!config.f_PacketLevelFilter && config.f_PassThroughMode)
+			{
+				ProcessPacket(newPacket);
+				continue;
+			}
 
 			auto& nestedPacket = s_Packets.emplace_back(std::move(newPacket));
 
@@ -235,6 +269,9 @@ namespace sniffer::packet
 
 			ProcessPacket(nestedPacket);
 		}
+
+		if (!config.f_PacketLevelFilter && config.f_PassThroughMode)
+			return;
 
 		s_ChildMap[packet.uid()] = std::move(childs);
 	}
