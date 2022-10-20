@@ -37,13 +37,6 @@ namespace sniffer::gui
 			if (isConnecting)
 				ImGui::EndDisabled();
 
-			ImGui::SameLine();
-
-			if (ImGui::Button("Clear Queue"))
-			{
-				packet::PacketManager::ClearQueue();
-			}
-
 			ConfigWidget(config.f_PacketLevelFilter, "Filtering will be executed on the packet level,\nso packets will not be saved if they don't pass filter conditions."
 				"\nFiltered packets will not be passed to modify scripts.\nIt helps reduce memory consumption.");
 

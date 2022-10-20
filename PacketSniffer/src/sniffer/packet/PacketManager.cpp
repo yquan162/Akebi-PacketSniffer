@@ -46,14 +46,6 @@ namespace sniffer::packet
 		s_Packets.clear();
 	}
 
-	void PacketManager::ClearQueue()
-	{
-		while(s_ReceiveQueue.size() > 0) // this might be a really bad implementation but it works
-		{
-			s_ReceiveQueue.pop();
-		}
-	}
-
 	std::list<Packet> const& PacketManager::GetPackets()
 	{
 		return s_Packets;
@@ -157,7 +149,7 @@ namespace sniffer::packet
 
 	void PacketManager::Update()
 	{
-		if (s_ReceiveQueue.size() > 0)
+		while (s_ReceiveQueue.size() > 0)
 		{
 			auto rawData = s_ReceiveQueue.pop();
 			if (rawData)
@@ -526,11 +518,6 @@ namespace sniffer::packet
 	size_t PacketManager::GetPacketCount()
 	{
 		return s_Packets.size();
-	}
-
-	size_t PacketManager::GetQueueSize()
-	{
-		return s_ReceiveQueue.size();
 	}
 
 	void PacketManager::CheckSessionUpdate(uint32_t sequenceID)
