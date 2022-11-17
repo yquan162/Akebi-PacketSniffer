@@ -21,12 +21,14 @@ namespace sniffer::pipe
 
 		const std::string& GetPipeName() const;
 		void SetPipeName(const std::string& name);
+		void UpdateConnection(const bool connection);
 
 	private:
 
 		PipeServer m_Server;
 		std::string m_PipeName;
 		bool m_ModifyingEnabled;
+		bool m_ShouldConnect = true;
 	};
 }
 

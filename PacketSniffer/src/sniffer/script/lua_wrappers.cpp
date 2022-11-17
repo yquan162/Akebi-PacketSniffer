@@ -575,9 +575,8 @@ namespace sniffer::script
 			int i = 1;
 			for (auto& value : value->to_list())
 			{
-				lua_pushinteger(L, i);
 				Luna<ValueWrapper>::Push(L, new ValueWrapper(&value, modifiable));
-				i++;
+				lua_rawseti(L, 1, i++);
 			}
 			break;
 		}
@@ -588,6 +587,7 @@ namespace sniffer::script
 			{
 				PushProtoValue(L, &key, modifiable);
 				Luna<ValueWrapper>::Push(L, new ValueWrapper(&value, modifiable));
+				lua_rawset(L, -3);
 			}
 			break;
 		}

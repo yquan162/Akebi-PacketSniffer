@@ -11,5 +11,6 @@ namespace sniffer::packet
 		virtual void Response(RawPacketData data, ModifyType type) = 0;
 		virtual bool IsModifyingEnabled() const = 0;
 		virtual bool IsConnected() = 0;
+		virtual void UpdateConnection(bool connect) = 0;
 	};
 }

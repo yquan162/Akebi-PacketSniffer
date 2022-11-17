@@ -2,6 +2,7 @@
 #include "SettingsWnd.h"
 
 #include <sniffer/Config.h>
+#include <sniffer/packet/PacketManager.h>
 
 namespace sniffer::gui
 {
@@ -17,9 +18,53 @@ namespace sniffer::gui
 	void SettingsWnd::Draw()
 	{
 		auto& config = Config::instance();
+
+		if (ImGui::BeginGroupPanel("Packet"))
+		{
+			static bool shouldConnect = true;
+			const bool isConnecting = shouldConnect && !packet::PacketManager::IsConnected();
+			const char* connectText = isConnecting ? "Connecting..." : (shouldConnect ? "Disconnect Pipe" : "Connect Pipe");
+
+			if (isConnecting)
+				ImGui::BeginDisabled();
+
+			if (ImGui::Button(connectText))
+			{
+				shouldConnect = !shouldConnect;
+				packet::PacketManager::UpdateConnection(shouldConnect);
+			}
+
+			if (isConnecting)
+				ImGui::EndDisabled();
+
+			ConfigWidget(config.f_PacketLevelFilter, "Filtering will be executed on the packet level,\nso packets will not be saved if they don't pass filter conditions."
+				"\nFiltered packets will not be passed to modify scripts.\nIt helps reduce memory consumption.");
+
+			if (config.f_PacketLevelFilter)
+				ImGui::BeginDisabled();
+
+			ConfigWidget(config.f_PassThroughMode, "If enabled, packets will pass filters but won't save.\nNot compatible with packet level filter."
+				"\nModify scripts will also be ignored.\nUseful for filter script logging without eating too much memory.");
+
+			if (config.f_PacketLevelFilter)
+				ImGui::EndDisabled();
+
+			ConfigWidget(config.f_ShowUnknownPackets, "Show unknown packets in capture list.");
+		}
+		ImGui::EndGroupPanel();
+
+		if (ImGui::BeginGroupPanel("Display"))
+		{
+			ConfigWidget(config.f_ShowUnknownFields, "Show unknown fields in packet view.");
+			ConfigWidget(config.f_ShowUnsettedFields, "Show fields with missing data in packet view.");
+			ConfigWidget(config.f_ScrollFollowing, "Follow items when new data appears above the scroll region.");
+			ConfigWidget(config.f_HighlightRelativities, "Highlight packet relativities in capture list.");
+		}
+		ImGui::EndGroupPanel();
+
 		if (ImGui::BeginGroupPanel("Proto"))
 		{
-			ConfigWidget(config.f_ProtoIDMode, "The mode searching the id's for .proto");
+			ConfigWidget(config.f_ProtoIDMode, "The mode for searching id's for .proto");
 
 			static bool isChanging = false;
 			static std::string protoDirPathTemp = config.f_ProtoDirPath;
@@ -64,15 +109,6 @@ namespace sniffer::gui
 			}
 		}
 		ImGui::EndGroupPanel();
-
-		ConfigWidget(config.f_ShowUnknownPackets, "Show unknown packets in capture list.");
-		ConfigWidget(config.f_ShowUnknownFields, "Show unknown fields in capture list.");
-		ConfigWidget(config.f_ShowUnsettedFields, "Show fields even the their data wasn't passed.");
-		ConfigWidget(config.f_ScrollFollowing, "Following for items when new data appear above the scroll region.");
-
-		ConfigWidget(config.f_HighlightRelativities, "Highlight the packet relativities in packet capture window.");
-		ConfigWidget(config.f_PacketLevelFilter, "Filtering will be execute on packet level,\n so packet will not save if it don't accept filter conditions."
-			"\nFiltered packet will not passed to modify scripts.\nIt helps to reduce memory consumption.");
 	}
 
 	WndInfo& SettingsWnd::GetInfo()

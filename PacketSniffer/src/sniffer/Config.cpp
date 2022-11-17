@@ -14,8 +14,8 @@ namespace sniffer
 		NF(f_ShowUnknownPackets, "Show unknown packets", "Sniffer::Settings", true),
 		NF(f_ShowUnsettedFields, "Show unsetted fields", "Sniffer::Settings", true),
 		NF(f_HighlightRelativities, "Highlight relativities", "Sniffer::Settings", true),
-		NF(f_PacketLevelFilter, "Packet level filter", "Sniffer::Settings", false)
-
+		NF(f_PacketLevelFilter, "Packet level filter", "Sniffer::Settings", false),
+		NF(f_PassThroughMode, "Pass-through mode", "Sniffer::Settings", false)
 	{ }
 
 	Config& Config::instance()
