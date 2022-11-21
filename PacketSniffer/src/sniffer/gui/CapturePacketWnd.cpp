@@ -71,7 +71,7 @@ namespace sniffer::gui
 	void CapturePacketWnd::Clear()
 	{
 		PacketWndBase::Clear();
-		packet::PacketManager::Clear();
+		packet::PacketManager::ClearPackets();
 	}
 
 	static ImColor _colorPallete[] = {

@@ -373,6 +373,11 @@ namespace sniffer::gui
 		return it->second.IsEditorOpened();
 	}
 
+	void ScriptEditorManager::Reload(script::Script* script)
+	{
+		script->CompileScript();
+	}
+
 	void ScriptEditorManager::Draw()
 	{
 		std::vector<script::Script*> toRemove;

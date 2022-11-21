@@ -197,8 +197,19 @@ namespace sniffer::gui
 		if (editDisabled)
 			ImGui::EndDisabled();
 
+		ImGui::SameLine();
+
+		if (script == nullptr)
+			ImGui::BeginDisabled();
+
+		if (ImGui::Button("Reload"))
+			ScriptEditorManager::Reload(script);
+
+		if (script == nullptr)
+			ImGui::EndDisabled();
+
 		if (script != nullptr && !script->GetLua().HasFunction("on_filter"))
-			ImGui::TextColored(ImVec4(0.94f, 0.11f, 0.07f, 1.0f), "SErr: Script have not function `on_filter`.");
+			ImGui::TextColored(ImVec4(0.94f, 0.11f, 0.07f, 1.0f), "SErr: Script does not have function `on_filter`.");
 
 		if (script != nullptr && script->HasError())
 			ImGui::TextColored(ImVec4(0.94f, 0.11f, 0.07f, 1.0f), "PErr: %s", script->GetError().c_str());
@@ -331,13 +342,13 @@ namespace sniffer::gui
 			if (ImGui::Checkbox("Enabled", &isIntermediateEnabled))
 				filter::FilterManager::SetIntermediateGroupEnabled(isIntermediateEnabled);
 			ImGui::SameLine();
-			HelpMarker("If enabled, context menu filters will be add to intermediate group, if not - to the main.");
+			HelpMarker("If enabled, context menu filters will be added to the intermediate group, if not - to the main.");
 
 			bool isOverrideEnabled = filter::FilterManager::IsOverrideModeEnabled();
 			if (ImGui::Checkbox("Override mode", &isOverrideEnabled))
 				filter::FilterManager::SetOverrideModeEnabled(isOverrideEnabled);
 			ImGui::SameLine();
-			HelpMarker("The intermediate filter will override the main filter if no empty.");
+			HelpMarker("The intermediate filter will override the main filter if it's not empty.");
 
 			auto& intermediateGroup = filter::FilterManager::GetIntermediateFilter();
 			auto disabled = !isIntermediateEnabled || intermediateGroup.IsEmpty();
